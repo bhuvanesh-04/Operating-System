@@ -1,0 +1,23 @@
+#include <stdio.h>
+#define FRAMES 3
+int main(void) {
+    int pages[] = {1, 2, 3, 4, 1, 2, 5};
+    int n = sizeof(pages) / sizeof(pages[0]);
+    int frame[FRAMES];
+    for (int i = 0; i < FRAMES; i++)
+        frame[i] = -1;
+    int next = 0, faults = 0;
+    for (int i = 0; i < n; i++) {
+        int hit = 0;
+        for (int j = 0; j < FRAMES; j++)
+            if (frame[j] == pages[i])
+                hit = 1;
+        if (!hit) {
+            frame[next] = pages[i];
+            next = (next + 1) % FRAMES;  // FIFO replacement
+            faults++;
+        }
+    }
+    printf("Page Faults = %d\n", faults);
+    return 0;
+}
