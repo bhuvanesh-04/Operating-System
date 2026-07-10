@@ -1,0 +1,13 @@
+#include <stdio.h>
+int main(void) {
+    int total = 100;      // total memory
+    int request = 30;     // requested block size
+    if (request <= total) {
+        total -= request;
+        printf("Allocated %d units\n", request);
+        printf("Remaining memory: %d units\n", total);
+    } else {
+        printf("Not enough memory\n");
+    }
+    return 0;
+}
