@@ -22,12 +22,10 @@ b)open() to open the file,write() to write in the file
 c)START
  Open "source.txt" for reading
  Open "destination.txt" for writing
-
  While there is data to read:
    Read a chunk of data from "source.txt"
    Write that chunk of data to "destination.txt"
 EndWhile
-
  Close "source.txt"
 Close "destination.txt"
 END
