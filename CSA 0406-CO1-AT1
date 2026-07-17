@@ -11,8 +11,7 @@ print pid of parent process and child process
 2.
 a)create(),open(),write(),read(),close()
 b)create()-to create the file,open()-open the file
-c)DECLARE StudentName : STRING
-StudentName  "Alice Smith"
+c)StudentName  "Alice Smith"
 OPENFILE "students.txt" FOR WRITE
 WRITEFILE "students.txt", StudentName
 CLOSEFILE "students.txt"
@@ -23,8 +22,8 @@ c)START
  Open "source.txt" for reading
  Open "destination.txt" for writing
  While there is data to read:
-   Read a chunk of data from "source.txt"
-   Write that chunk of data to "destination.txt"
+   Read a data from "source.txt"
+   Write that data to "destination.txt"
 EndWhile
  Close "source.txt"
 Close "destination.txt"
