@@ -1,0 +1,100 @@
+NAME:Bhuvaneshwaran J
+REG NO:192511402
+ANSWERS:
+1Q)
+Problem & Constraints: 50 GB total storage. Logs must not exceed 10 GB. System stability and service availability must be maintained.
+Partition Layout (LVM Recommended):
+./ (Root): 15 GB (Operating system binaries, config files)
+./var/log: 10 GB (Dedicated volume ensures log growth cannot freeze / or /home)
+./home or /data: 20 GB (User files and application data)
+.swap: 5 GB (System memory management)
+Log Rotation Strategy (/etc/logrotate.d/app-logs):
+command:
+/var/log/app/*.log {
+    daily
+    rotate 7
+    maxsize 10G
+    size 1G
+    compress
+    missingok
+    notifempty
+    postrotate
+        /usr/bin/systemctl reload app-service > /dev/null 2>&1 || true
+    endscript
+}
+Justification: Isolating /var/log into its own LVM partition guarantees that even if logs fill up to 10 GB, critical system processes writing to / or application data written to /home will continue operating without disk exhaustion failure.
+2Q)
+Scheduler Tuning:
+The Linux scheduler decides which process or thread gets CPU time. Scheduler parameters can be tuned to reduce switching overhead.
+Adjust scheduling policy: Use policies such as SCHED_FIFO or SCHED_RR for real-time tasks.
+Set process priority: nice and renice can give important processes higher CPU priority.
+CPU affinity: Bind critical processes to specific CPU cores using taskset, reducing unnecessary migration between CPUs.
+Reduce unnecessary preemption: Adjust kernel preemption settings when workloads contain CPU-intensive tasks.
+Real-time scheduling: Real-time processes can be given higher priority so that time-sensitive operations execute with minimal delay.
+Kernel Modules:
+Kernel modules can improve performance by extending kernel functionality without rebuilding the entire kernel.
+Unnecessary modules can be disabled or unloaded to reduce kernel overhead.
+Custom modules can provide optimized hardware or I/O handling.
+Modules can be designed to handle specific workloads more efficiently.
+However, poorly designed modules may cause crashes or increase kernel overhead, so they should be carefully tested.
+taskset -c 2 ./realtime_program
+This runs the program on CPU core 2, reducing CPU migration and potentially reducing context-switching overhead.
+3Q)
+Proposed Approach:
+Assume the log file is server.log and we need to extract useful information such as error counts, IP addresses, status codes, or timestamps.
+An efficient shell script can use awk, grep, sort, and uniq rather than processing each line using a shell loop.
+#!/bin/bash
+LOGFILE="server.log"
+echo "Total Entries:"
+wc -l < "$LOGFILE"
+echo "Error Entries:"
+awk '$0 ~ /ERROR/' "$LOGFILE" | wc -l
+echo "HTTP Status Code Summary:"
+awk '{count[$9]++} END {
+    for (code in count)
+        print code, count[code]
+}' "$LOGFILE"
+echo "Top 10 IP Addresses:"
+awk '{count[$1]++} END {
+    for (ip in count)
+        print count[ip], ip
+}' "$LOGFILE" | sort -nr | head -10
+4Q)
+When a faulty process consumes 90% of CPU, the administrator should first identify the process, monitor its behavior, and then control or terminate it without rebooting the system. Critical services must be protected throughout the process.
+command:
+ps aux --sort=-%cpu | head -6
+read -p "Enter PID: " PID
+ps -p $PID -o pid,user,%cpu,%mem,stat,cmd
+top -b -n 5 -p $PID
+pidstat -p $PID 1 5
+renice +10 -p $PID
+ps -p $PID -o pid,user,%cpu,%mem,ni,stat,cmd
+kill $PID
+sleep 3
+ps -p $PID
+kill -9 $PID
+top -b -n 1 | head -15
+The administrator should not immediately reboot the system. The preferred strategy is to identify the faulty PID using top/ps, verify that it is not a critical process, and then reduce its priority or impose a CPU limit. If the process remains problematic, it should be gracefully terminated using kill, with kill -9 used only when necessary. Continuous monitoring ensures that critical services remain available while CPU utilization returns to normal.
+5Q)
+Calculate Available RAM
+RAM available for VMs:
+16 GB − 4 GB = 12 GB
+Minimum RAM required by 5 VMs:
+5 × 2 GB = 10 GB
+Therefore, 12 GB is sufficient to run all 5 VMs.
+Resource	RAM Allocation
+Host OS	4 GB
+VM1	2.4 GB
+VM2	2.4 GB
+VM3	2.4 GB
+VM4	2.4 GB
+VM5	2.4 GB
+Total	16 GB
+To ensure smooth operation:
+Dynamic Memory Allocation: Allow VMs to receive additional memory when required.
+Memory Ballooning: Reclaim unused memory from less-active VMs and provide it to VMs under higher load.
+Memory Overcommitment: Can be used carefully if workloads are not simultaneously memory-intensive.
+Memory Reservation: Reserve at least 2 GB for each VM so that the minimum requirement is always satisfied.
+Host Reservation: Keep 4 GB dedicated to the host OS to prevent the host from becoming unstable.
+Conclusion
+The server can successfully host all 5 VMs without exceeding the available 16 GB RAM. Allocating 4 GB to the host and 2.4 GB to each VM is a simple and safe strategy. For workloads with varying memory demands, dynamic allocation and memory ballooning can further improve resource utilization while maintaining the minimum 2 GB requirement for each VM.
