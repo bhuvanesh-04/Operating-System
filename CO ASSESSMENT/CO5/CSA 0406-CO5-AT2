@@ -1,0 +1,78 @@
+NAME:Bhuvaneshwaran J
+REG NO:192511402
+ANSWERS:
+1Q)
+BEGIN
+ SET threshold = 80
+SET usage = GET_DISK_USAGE()  
+ IF usage > threshold THEN
+ SET log_files = GET_LOG_FILES()
+ SORT log_files BY size DESCENDING
+FOR EACH file IN log_files DO
+ COMPRESS_OR_DELETE(file)
+ usage = GET_DISK_USAGE()
+  IF usage <= threshold THEN
+   BREAK
+ ENDIF
+ENDFOR
+ENDIF
+END
+2Q)
+BEGIN
+INPUT process_list
+SORT process_list BY priority DESCENDING
+WHILE process_list IS NOT EMPTY DO
+SET current_process = REMOVE_FIRST(process_list)
+ALLOCATE_CPU(current_process)
+EXECUTE(current_process)
+IF current_process.is_completed == FALSE THEN
+  DECREASE_PRIORITY(current_process)
+  REINSERT_BY_PRIORITY(process_list, current_process)
+    ENDIF
+    ENDWHILE
+END
+3Q)
+BEGIN
+SET total_RAM = 16GB
+SET host_reserved = 4GB
+SET available_RAM = total_RAM - host_reserved
+SET min_RAM_per_VM = 2GB
+INPUT number_of_VMs
+ FOR i = 1 TO number_of_VMs DO
+IF available_RAM >= min_RAM_per_VM THEN
+ALLOCATE_RAM(VM[i], min_RAM_per_VM)
+available_RAM = available_RAM - min_RAM_per_VM
+PRINT "Successfully allocated " + min_RAM_per_VM + " to VM " + i
+ELSE
+PRINT "Error: Insufficient RAM for VM " + i
+ENDIF
+    ENDFOR
+END
+4Q)
+BEGIN
+INPUT performance_required, budget, direct_hardware_access
+IF performance_required == HIGH AND direct_hardware_access == TRUE THEN
+SET selected_hypervisor = "Type 1 (Bare-Metal Hypervisor)"
+SET justification = "Provides low latency, direct hardware control, and high performance."
+    ELSE IF budget == LOW THEN
+SET selected_hypervisor = "Type 2 (Hosted Hypervisor)"
+SET justification = "Lower cost, runs on top of existing OS, simple to set up."
+    ELSE
+SET selected_hypervisor = "Type 1 (Bare-Metal Hypervisor)"
+SET justification = "Ensures optimal resource utilization and stability."
+    ENDIF
+    PRINT selected_hypervisor
+    PRINT justification
+END
+5Q)
+BEGIN
+    INPUT application_list
+FOR EACH app IN application_list DO
+SET cgroup_name = app.name + "_cgroup"
+CREATE_CGROUP(cgroup_name)
+SET_CPU_LIMIT(cgroup_name, app.max_cpu_percent)
+SET_MEMORY_LIMIT(cgroup_name, app.max_memory_mb)
+ ATTACH_PROCESS(cgroup_name, app.process_id)
+PRINT "Configured limits for " + app.name
+    ENDFOR
+END
