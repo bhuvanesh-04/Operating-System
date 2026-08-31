@@ -1,0 +1,30 @@
+#include <stdio.h>
+int main() {
+    int n, i, first, last, current;
+    int next[50];
+    printf("Enter number of disk blocks: ");
+    scanf("%d", &n);
+    printf("Enter next block (-1 for last block):\n");
+    for(i = 0; i < n; i++) {
+        printf("Block %d -> ", i);
+        scanf("%d", &next[i]);
+    }
+    printf("Enter first block: ");
+    scanf("%d", &first);
+    printf("Enter last block: ");
+    scanf("%d", &last);
+    printf("\nLinked File Allocation:\n");
+    printf("First Block = %d\n", first);
+    printf("Last Block  = %d\n", last);
+    printf("File Blocks: ");
+    current = first;
+    while(current != -1) {
+        printf("%d", current);
+        if(current == last)
+            break;
+        printf(" -> ");
+        current = next[current];
+    }
+    printf(" -> NULL\n");
+    return 0;
+}
