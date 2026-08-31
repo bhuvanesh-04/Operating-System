@@ -1,0 +1,23 @@
+#include <stdio.h>
+int main() {
+    FILE *fp;
+    char data[100];
+    fp = fopen("file.txt", "w");
+    printf("Enter data: ");
+    scanf(" %[^\n]", data);
+    fprintf(fp, "%s", data);
+    fclose(fp);
+    printf("\nFile created and data written successfully.\n");
+    fp = fopen("file.txt", "r");
+    printf("File content: ");
+    while (fgets(data, sizeof(data), fp) != NULL)
+        printf("%s", data);
+    fclose(fp);
+    fp = fopen("file.txt", "a");
+    fprintf(fp, "\nNew data added.");
+    fclose(fp);
+    printf("\nData appended successfully.\n");
+    remove("file.txt");
+    printf("File deleted successfully.\n");
+    return 0;
+}
