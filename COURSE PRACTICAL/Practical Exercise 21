@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <string.h>
+int main() {
+    char files[20][30];
+    int n = 0, choice, i;
+    char name[30];
+    while(1) {
+        printf("\n1. Create File");
+        printf("\n2. Display Files");
+        printf("\n3. Search File");
+        printf("\n4. Delete File");
+        printf("\n5. Exit");
+        printf("\nEnter choice: ");
+        scanf("%d", &choice);
+        switch(choice) {
+        case 1:
+            printf("Enter file name: ");
+            scanf("%s", name);
+            strcpy(files[n], name);
+            n++;
+            printf("File created successfully\n");
+            break;
+        case 2:
+            printf("\nFiles in Directory:\n");
+            for(i = 0; i < n; i++)
+                printf("%s\n", files[i]);
+            break;
+        case 3:
+            printf("Enter file name to search: ");
+            scanf("%s", name);
+
+            for(i = 0; i < n; i++) {
+                if(strcmp(files[i], name) == 0) {
+                    printf("File found\n");
+                    break;
+                }
+            }
+            if(i == n)
+                printf("File not found\n");
+            break;
+        case 4:
+            printf("Enter file name to delete: ");
+            scanf("%s", name);
+            for(i = 0; i < n; i++) {
+                if(strcmp(files[i], name) == 0) {
+                    for(int j = i; j < n - 1; j++)
+                        strcpy(files[j], files[j + 1]);
+                    n--;
+                    printf("File deleted successfully\n");
+                    break;
+                }
+            }
+            if(i == n)
+                printf("File not found\n");
+            break;
+        case 5:
+            return 0;
+
+        default:
+            printf("Invalid choice\n");
+        }
+    }
+}
