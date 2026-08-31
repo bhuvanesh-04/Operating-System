@@ -1,0 +1,20 @@
+#include <stdio.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+int main() {
+    int fd;
+    fd = open("file.txt", O_CREAT | O_RDWR, 0644);
+    if (fd == -1) {
+        printf("File creation failed\n");
+        return 1;
+    }
+    printf("File created successfully\n");
+    chmod("file.txt", 0755);
+    printf("File permission changed to 755\n");
+    close(fd);
+    printf("Owner  : Read Write Execute\n");
+    printf("Group  : Read Execute\n");
+    printf("Others : Read Execute\n");
+    return 0;
+}
